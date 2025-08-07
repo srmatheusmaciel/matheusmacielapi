@@ -1,0 +1,3 @@
+Ana Souza;111.222.333-44;(21)99999-8888;ana.souza@email.com;203;false;550.00
+Carlos Pereira;555.666.777-88;(21)98888-7777;carlos.p@email.com;101;true;890.50
+Mariana Lima;999.888.777-66;(21)97777-6666;mari.lima@email.com;305;true;1250.75
