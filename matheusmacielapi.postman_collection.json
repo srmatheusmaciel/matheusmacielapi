@@ -8,143 +8,376 @@
 	},
 	"item": [
 		{
-			"name": "listarTodos",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/api/moradores",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"moradores"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "{{baseUrl}}/api/moradores/1",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "moradores",
+			"item": [
+				{
+					"name": "listarTodos",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/moradores",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"moradores"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{baseUrl}}/api/moradores/1",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"moradores",
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "{{baseUrl}}/api/moradores",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"nome\": \"Pedro Costa\",\n  \"documento\": \"456.789.123-00\",\n  \"telefone\": \"(21)95555-4444\",\n  \"email\": \"pedro.costa@email.com\",\n  \"unidade\": {\n    \"id\": 101,\n    \"numero\": \"Apto 101\",\n    \"descricao\": \"2 quartos, frente\",\n    \"bloco\": {\n      \"id\": 1,\n      \"nome\": \"Bloco A - Girassol\"\n    }\n  },\n  \"proprietario\": false,\n  \"taxaCondominio\": 620.00\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+				{
+					"name": "{{baseUrl}}/api/moradores/1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/moradores/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"moradores",
+								"1"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{baseUrl}}/api/moradores",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"moradores"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "{{baseUrl}}/api/moradores/1",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"id\": 1,\n  \"nome\": \"Ana Souza Silva\",\n  \"documento\": \"111.222.333-44\",\n  \"telefone\": \"(21)99999-8888\",\n  \"email\": \"ana.souza@email.com\",\n  \"unidade\": {\n    \"id\": 203,\n    \"numero\": \"Apto 203\",\n    \"descricao\": \"3 quartos, fundos\",\n    \"bloco\": {\n      \"id\": 1,\n      \"nome\": \"Bloco A - Girassol\"\n    }\n  },\n  \"proprietario\": false,\n  \"taxaCondominio\": 550.00\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+				{
+					"name": "{{baseUrl}}/api/moradores",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"Guilherme Freixinho\",\n  \"documento\": \"456.789.123-00\",\n  \"telefone\": \"(21)95555-4444\",\n  \"email\": \"pedro.costa@email.com\",\n  \"unidade\": {\n    \"id\": 101,\n    \"numero\": \"Apto 101\",\n    \"descricao\": \"2 quartos, frente\",\n    \"bloco\": {\n      \"id\": 1,\n      \"nome\": \"Bloco A - Girassol\"\n    }\n  },\n  \"proprietario\": false,\n  \"taxaCondominio\": 620.00\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/moradores",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"moradores"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{baseUrl}}/api/moradores/1",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"moradores",
-						"1"
-					]
+				{
+					"name": "{{baseUrl}}/api/moradores/1",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1,\n  \"nome\": \"Ana Souza Silva\",\n  \"documento\": \"111.222.333-44\",\n  \"telefone\": \"(21)99999-8888\",\n  \"email\": \"ana.souza@email.com\",\n  \"unidade\": {\n    \"id\": 203,\n    \"numero\": \"Apto 203\",\n    \"descricao\": \"3 quartos, fundos\",\n    \"bloco\": {\n      \"id\": 1,\n      \"nome\": \"Bloco A - Girassol\"\n    }\n  },\n  \"proprietario\": false,\n  \"taxaCondominio\": 550.00\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/moradores/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"moradores",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8080/api/moradores/2",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/moradores/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"moradores",
+								"2"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "http://localhost:8080/api/moradores/2",
-			"request": {
-				"auth": {
-					"type": "noauth"
+			"name": "visitantes",
+			"item": [
+				{
+					"name": "New Request",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/visitantes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"visitantes"
+							]
+						}
+					},
+					"response": []
 				},
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/api/moradores/2",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"moradores",
-						"2"
-					]
+				{
+					"name": "http://localhost:8080/api/visitantes/1",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/visitantes/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"visitantes",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8080/api/visitantes",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nome\": \"Carla Dias\",\n    \"documento\": \"101.202.303-04\",\n    \"telefone\": \"(21)94444-5555\",\n    \"email\": \"carla.dias@email.com\",\n    \"rg\": \"55.666.777-8\",\n    \"autorizadoPor\": \"Ana Souza\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/visitantes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"visitantes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8080/api/visitantes/1/registrar-entrada",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/visitantes/1/registrar-entrada",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"visitantes",
+								"1",
+								"registrar-entrada"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8080/api/visitantes/1",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/visitantes/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"visitantes",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8080/api/acessos/1/registrar-saida",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/acessos/1/registrar-saida",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"acessos",
+								"1",
+								"registrar-saida"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
+		},
+		{
+			"name": "veiculos",
+			"item": [
+				{
+					"name": "cadastrar veiculo",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"placa\": \"AAA0B11\",\n    \"modelo\": \"Jeep Renegade\",\n    \"cor\": \"Cinza\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/moradores/3/veiculos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"moradores",
+								"3",
+								"veiculos"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }

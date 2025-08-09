@@ -19,6 +19,14 @@ public class ExceptionHandlerController {
         return ResponseEntity.status(status).body(err);
     }
 
+    @ExceptionHandler(ValidacaoNegocioException.class)
+    public ResponseEntity<StandardError> validacaoNegocio(ValidacaoNegocioException e, HttpServletRequest request) {
+        String error = "Erro de validação";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
     private static class StandardError {
         public Instant timestamp;
         public Integer status;
