@@ -1,21 +1,25 @@
 # API de Portaria de Condomínio - Spring Boot
 
-Este projeto é uma API RESTful desenvolvida em Java com Spring Boot para gerenciar as operações de uma portaria de condomínio. A aplicação foi criada como parte do curso de pós-graduação em Engenharia de Software JAVA da INFNET.
+Este projeto é uma API RESTful desenvolvida em Java com Spring Boot para gerenciar as operações de uma portaria de condomínio. A aplicação foi criada como parte do curso de pós-graduação em Engenharia de Software JAVA.
 
-## Feature 1: Base da API e CRUD de Moradores
+## Funcionalidades Implementadas
 
-Nesta primeira entrega, foram implementados os alicerces da aplicação, incluindo:
+Até o momento, o projeto conta com as seguintes features:
 
--   **Arquitetura em Camadas**: O projeto está estruturado com separação de responsabilidades (`Controller`, `Service`, `Domain`).
--   **Entidade Principal**: Modelagem da entidade `Morador` e suas associações (`Pessoa`, `Unidade`, `Bloco`).
--   **API RESTful Completa**: Endpoints para todas as operações CRUD (Criar, Ler, Atualizar, Excluir) para a entidade `Morador`.
--   **Persistência em Memória**: Utilização de `ConcurrentHashMap` na camada de serviço para simular um banco de dados e armazenar os dados em tempo de execução.
--   **Carregamento de Dados Iniciais**: Um `DataLoader` que popula o sistema com dados iniciais a partir de arquivos de texto (`.txt`) na inicialização da aplicação.
--   **Tratamento de Exceções**: Implementação de um manipulador de exceções global (`@RestControllerAdvice`) para retornar respostas de erro padronizadas (ex: 404 Not Found).
+-   **Arquitetura em Camadas**: O projeto está estruturado com separação de responsabilidades (`Controller`, `Service`, `Domain`, `Loader`).
+-   **Modelo de Domínio Abrangente**:
+    -   Herança implementada com a classe abstrata `Pessoa` como base para `Morador` e `Visitante`.
+    -   Associação (One-to-Many) entre `Morador` e `Veiculo`.
+    -   Histórico de acessos com a entidade `RegistroAcesso`, associada a `Visitante`.
+-   **API RESTful Completa**: Endpoints para todas as operações CRUD (Criar, Ler, Atualizar, Excluir) para as entidades `Morador` e `Visitante`.
+-   **Endpoints de Negócio**: Operações específicas como associar veículos e registrar a entrada/saída de visitantes.
+-   **Persistência em Memória**: Utilização de `ConcurrentHashMap` na camada de serviço para simular um banco de dados.
+-   **Carga de Dados Inicial**: Loaders específicos por entidade (`MoradorLoader`, `VeiculoLoader`, `VisitanteLoader`) que populam o sistema a partir de arquivos de texto (`.txt`).
+-   **Tratamento de Exceções**: Manipulador de exceções global (`@RestControllerAdvice`) para retornar respostas de erro padronizadas (404 Not Found, 400 Bad Request).
 
 ## Tecnologias Utilizadas
 
--   **Java 21**
+-   **Java 21** (ou superior)
 -   **Spring Boot 3**
 -   **Maven**
 
@@ -38,139 +42,84 @@ Para executar este projeto localmente, você precisará ter instalado:
     ```bash
     ./mvnw clean install
     ```
-    *(No Windows, use `mvn clean install`)*
+    *(No Windows, use `mvnw.cmd clean install`)*
 
 3.  **Execute a aplicação:**
     ```bash
-    java -jar target/matheusmacielapi-0.0.1-SNAPSHOT.jar
+    java -jar target/matheusmacielapi-*.jar
     ```
 
 A API estará disponível em `http://localhost:8080`.
 
 ## Documentação da API
 
-A seguir estão os detalhes dos endpoints disponíveis para a entidade `Morador`.
+A seguir estão os detalhes dos endpoints disponíveis.
 
-#### Respostas de Erro
+#### Respostas de Erro Comuns
 
-Caso um recurso não seja encontrado (ex: um morador com um ID inexistente), a API retornará o status `404 Not Found` com o seguinte corpo:
-```json
-{
-    "timestamp": "2025-08-07T23:59:59.12345Z",
-    "status": 404,
-    "error": "Recurso não encontrado",
-    "message": "Morador não encontrado para o ID: 99",
-    "path": "/moradores/99"
-}
-```
+-   **404 Not Found**: Retornado quando um recurso específico (morador, visitante, etc.) não é encontrado.
+    ```json
+    {
+        "timestamp": "2025-08-09T16:50:10.123Z",
+        "status": 404,
+        "error": "Recurso não encontrado",
+        "message": "Morador não encontrado para o ID: 99",
+        "path": "/moradores/99"
+    }
+    ```
+-   **400 Bad Request**: Retornado para erros de validação de negócio (ex: placa de veículo duplicada).
+    ```json
+    {
+        "timestamp": "2025-08-09T16:51:20.456Z",
+        "status": 400,
+        "error": "Erro de validação",
+        "message": "A placa 'RIO2A18' já está cadastrada no sistema.",
+        "path": "/moradores/1/veiculos"
+    }
+    ```
 
 ---
 
 ### Endpoints de Moradores
 
-#### 1. Listar Todos os Moradores
-
--   **Método:** `GET`
--   **URL:** `/api/moradores`
--   **Resposta de Sucesso (200 OK):**
-    ```json
-    [
+-   `GET /moradores`: Lista todos os moradores.
+-   `GET /moradores/{id}`: Busca um morador por ID.
+-   `POST /moradores`: Cria um novo morador.
+-   `PUT /moradores/{id}`: Atualiza um morador existente.
+-   `DELETE /moradores/{id}`: Exclui um morador.
+-   `POST /moradores/{idMorador}/veiculos`: Adiciona um novo veículo a um morador.
+    -   **Corpo da Requisição (JSON):**
+        ```json
         {
-            "id": 1,
-            "nome": "Ana Souza",
-            "documento": "111.222.333-44",
-            "telefone": "(21)99999-8888",
-            "email": "ana.souza@email.com",
-            "unidade": {
-                "id": 203,
-                "numero": "Apto 203",
-                "descricao": "3 quartos, fundos",
-                "bloco": { "id": 1, "nome": "Bloco A - Girassol" }
-            },
-            "proprietario": false,
-            "taxaCondominio": 550.0
+            "placa": "XYZ1B23",
+            "modelo": "Hyundai HB20",
+            "cor": "Prata"
         }
-    ]
-    ```
+        ```
 
-#### 2. Buscar Morador por ID
+### Endpoints de Visitantes
 
--   **Método:** `GET`
--   **URL:** `/api/moradores/{id}`
--   **Exemplo:** `/moradores/1`
--   **Resposta de Sucesso (200 OK):**
-    ```json
-    {
-        "id": 1,
-        "nome": "Ana Souza",
-        "documento": "111.222.333-44",
-        "telefone": "(21)99999-8888",
-        "email": "ana.souza@email.com",
-        "unidade": {
-            "id": 203,
-            "numero": "Apto 203",
-            "descricao": "3 quartos, fundos",
-            "bloco": { "id": 1, "nome": "Bloco A - Girassol" }
-        },
-        "proprietario": false,
-        "taxaCondominio": 550.0
-    }
-    ```
+-   `GET /visitantes`: Lista todos os visitantes.
+-   `GET /visitantes/{id}`: Busca um visitante por ID.
+-   `POST /visitantes`: Cria um novo visitante.
+    -   **Corpo da Requisição (JSON):**
+        ```json
+        {
+            "nome": "Carla Dias",
+            "documento": "101.202.303-04",
+            "telefone": "(21)94444-5555",
+            "email": "carla.dias@email.com",
+            "rg": "55.666.777-8",
+            "autorizadoPor": "Ana Souza"
+        }
+        ```
+-   `PUT /visitantes/{id}`: Atualiza um visitante existente.
+-   `DELETE /visitantes/{id}`: Exclui um visitante.
 
-#### 3. Criar Novo Morador
+### Endpoints de Controle de Acesso
 
--   **Método:** `POST`
--   **URL:** `/api/moradores`
--   **Corpo da Requisição (JSON):**
-    ```json
-    {
-      "nome": "Pedro Costa",
-      "documento": "456.789.123-00",
-      "telefone": "(21)95555-4444",
-      "email": "pedro.costa@email.com",
-      "unidade": {
-        "id": 101,
-        "numero": "Apto 101",
-        "descricao": "2 quartos, frente",
-        "bloco": { "id": 1, "nome": "Bloco A - Girassol" }
-      },
-      "proprietario": false,
-      "taxaCondominio": 620.00
-    }
-    ```
--   **Resposta de Sucesso (201 Created):** Retorna o objeto criado com o novo `id` e o header `Location` com a URL do novo recurso.
-
-#### 4. Atualizar Morador Existente
-
--   **Método:** `PUT`
--   **URL:** `/api/moradores/{id}`
--   **Exemplo:** `/moradores/1`
--   **Corpo da Requisição (JSON):**
-    ```json
-    {
-      "id": 1,
-      "nome": "Ana Souza Silva",
-      "documento": "111.222.333-44",
-      "telefone": "(21)99999-8888",
-      "email": "ana.silva@email.com",
-      "unidade": {
-        "id": 203,
-        "numero": "Apto 203",
-        "descricao": "3 quartos, fundos",
-        "bloco": { "id": 1, "nome": "Bloco A - Girassol" }
-      },
-      "proprietario": false,
-      "taxaCondominio": 550.0
-    }
-    ```
--   **Resposta de Sucesso (200 OK):** Retorna o objeto completo com os dados atualizados.
-
-#### 5. Excluir Morador
-
--   **Método:** `DELETE`
--   **URL:** `/api/moradores/{id}`
--   **Exemplo:** `/moradores/2`
--   **Resposta de Sucesso (204 No Content):** Retorna uma resposta vazia.
+-   `POST /visitantes/{idVisitante}/registrar-entrada`: Registra uma nova entrada para um visitante. Não requer corpo. Retorna o objeto `RegistroAcesso` criado.
+-   `PATCH /acessos/{idAcesso}/registrar-saida`: Registra a saída em um registro de acesso existente. Não requer corpo.
 
 ## Estrutura de Dados Iniciais
 
@@ -179,3 +128,5 @@ Os dados iniciais são carregados a partir da pasta `/dados`. A estrutura dos ar
 -   **`blocos.txt`**: `id;nome`
 -   **`unidades.txt`**: `id;numero;descricao;id_do_bloco`
 -   **`moradores.txt`**: `nome;documento;telefone;email;id_da_unidade;proprietario;taxaCondominio`
+-   **`veiculos.txt`**: `id_do_morador;placa;modelo;cor`
+-   **`visitantes.txt`**: `nome;documento;telefone;email;rg;autorizadoPor`
