@@ -1,7 +1,9 @@
 package br.edu.infnet.matheusmacielapi.controller;
 
 import br.edu.infnet.matheusmacielapi.domain.Morador;
+import br.edu.infnet.matheusmacielapi.domain.Veiculo;
 import br.edu.infnet.matheusmacielapi.service.MoradorService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -38,6 +40,12 @@ public class MoradorController {
                 .buildAndExpand(moradorSalvo.getId()).toUri();
 
         return ResponseEntity.created(uri).body(moradorSalvo);
+    }
+
+    @PostMapping("/{moradorId}/veiculos")
+    public ResponseEntity<Veiculo> adicionarVeiculo(@PathVariable Long moradorId, @RequestBody Veiculo veiculo) {
+        Veiculo veiculoSalvo = moradorService.adicionarVeiculo(moradorId, veiculo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(veiculoSalvo);
     }
 
     @PutMapping("/{id}")

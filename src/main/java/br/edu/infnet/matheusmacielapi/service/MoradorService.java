@@ -1,6 +1,7 @@
 package br.edu.infnet.matheusmacielapi.service;
 
 import br.edu.infnet.matheusmacielapi.domain.Morador;
+import br.edu.infnet.matheusmacielapi.domain.Veiculo;
 import br.edu.infnet.matheusmacielapi.infra.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,12 @@ public class MoradorService implements CrudService<Morador, Long> {
 
     private final Map<Long, Morador> moradores = new ConcurrentHashMap<>();
     private final AtomicLong contadorDeIds = new AtomicLong();
+
+    private final VeiculoService veiculoService;
+
+    public MoradorService(VeiculoService veiculoService) {
+        this.veiculoService = veiculoService;
+    }
 
 
     @Override
@@ -63,5 +70,14 @@ public class MoradorService implements CrudService<Morador, Long> {
     public void excluir(Long id) {
         buscarPorId(id);
         moradores.remove(id);
+    }
+
+    public Veiculo adicionarVeiculo(Long moradorId, Veiculo veiculo) {
+        Morador morador = buscarPorId(moradorId);
+        Veiculo veiculoSalvo = veiculoService.salvar(veiculo);
+        morador.getVeiculos().add(veiculoSalvo);
+
+        return veiculoSalvo;
+
     }
 }
