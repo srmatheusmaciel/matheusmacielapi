@@ -24,17 +24,17 @@ public class VeiculoLoader implements ApplicationRunner {
         System.out.println(">>> [VeiculoLoader] Iniciando carregamento e associação de Veículos...");
 
         try (BufferedReader br = new BufferedReader(new FileReader("dados/veiculos.txt"))) {
-            String linha;
-            while ((linha = br.readLine()) != null) {
+            br.lines().forEach(linha -> {
                 String[] campos = linha.split(";");
-                Long idMorador = Long.parseLong(campos[0]);
+                Long idMoradorDoArquivo = Long.parseLong(campos[0]);
                 Veiculo veiculo = new Veiculo(null, campos[1], campos[2], campos[3]);
+
                 try {
-                    moradorService.adicionarVeiculo(idMorador, veiculo);
+                    moradorService.adicionarVeiculo(idMoradorDoArquivo, veiculo);
                 } catch (Exception e) {
-                    System.err.println("Erro ao carregar veículo do loader: " + e.getMessage());
+                    System.err.println("Erro ao carregar veículo do loader para o morador ID " + idMoradorDoArquivo + ": " + e.getMessage());
                 }
-            }
+            });
         }
         System.out.println(">>> [VeiculoLoader] Carga finalizada.");
     }

@@ -1,11 +1,18 @@
 package br.edu.infnet.matheusmacielapi.domain;
 
+import jakarta.persistence.*;
+
+@MappedSuperclass
 public abstract class Pessoa {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String nome;
 
+    @Column(nullable = false, unique = true)
     private String documento;
 
     private String telefone;

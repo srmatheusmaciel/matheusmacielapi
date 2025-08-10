@@ -3,81 +3,76 @@ package br.edu.infnet.matheusmacielapi.service;
 import br.edu.infnet.matheusmacielapi.domain.Morador;
 import br.edu.infnet.matheusmacielapi.domain.Veiculo;
 import br.edu.infnet.matheusmacielapi.infra.exception.ResourceNotFoundException;
+import br.edu.infnet.matheusmacielapi.repository.MoradorRepository;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
-public class MoradorService implements CrudService<Morador, Long> {
+public class MoradorService {
 
-    private final Map<Long, Morador> moradores = new ConcurrentHashMap<>();
-    private final AtomicLong contadorDeIds = new AtomicLong();
-
+    private final MoradorRepository moradorRepository;
     private final VeiculoService veiculoService;
 
-    public MoradorService(VeiculoService veiculoService) {
+    public MoradorService(MoradorRepository moradorRepository, VeiculoService veiculoService) {
+        this.moradorRepository = moradorRepository;
         this.veiculoService = veiculoService;
     }
 
-
-    @Override
-    public Morador salvar(Morador morador) {
-
-        Objects.requireNonNull(morador, "O morador não pode ser nulo.");
-        Objects.requireNonNull(morador.getUnidade(), "A unidade do morador não pode ser nula.");
-
-        Long id = contadorDeIds.incrementAndGet();
-        morador.setId(id);
-        moradores.put(id, morador);
-
-
-        return morador;
-    }
-
-    @Override
-    public Morador buscarPorId(Long id) {
-        Morador morador = moradores.get(id);
-
-        if(morador == null){
-            throw new ResourceNotFoundException("Morador não encontrado para o ID: " + id);
-        }
-
-        return moradores.get(id);
-    }
-
-
-    @Override
+    @Transactional(readOnly = true)
     public Collection<Morador> listarTodos() {
-        return moradores.values();
+        return moradorRepository.findAll();
     }
 
-    @Override
+    @Transactional(readOnly = true)
+    public Morador buscarPorId(Long id) {
+        return moradorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Morador não encontrado para o ID: " + id));
+    }
+
+    @Transactional
+    public Morador salvar(Morador morador) {
+        return moradorRepository.save(morador);
+    }
+
+    @Transactional
     public Morador atualizar(Long id, Morador moradorAtualizado) {
-
         buscarPorId(id);
-
         moradorAtualizado.setId(id);
-
-        moradores.put(id, moradorAtualizado);
-        return moradorAtualizado;
+        return moradorRepository.save(moradorAtualizado);
     }
 
-    @Override
+    @Transactional
     public void excluir(Long id) {
-        buscarPorId(id);
-        moradores.remove(id);
+        Morador morador = buscarPorId(id);
+        moradorRepository.delete(morador);
     }
 
-    public Veiculo adicionarVeiculo(Long moradorId, Veiculo veiculo) {
-        Morador morador = buscarPorId(moradorId);
+    @Transactional
+    public Veiculo adicionarVeiculo(Long idMorador, Veiculo veiculo) {
+        Morador morador = buscarPorId(idMorador);
+
         Veiculo veiculoSalvo = veiculoService.salvar(veiculo);
+
         morador.getVeiculos().add(veiculoSalvo);
+        moradorRepository.save(morador);
 
         return veiculoSalvo;
+    }
 
+    @Transactional
+    public void excluirVeiculo(Long idMorador, Long idVeiculo) {
+        Morador morador = buscarPorId(idMorador);
+
+        Veiculo veiculoParaExcluir = morador.getVeiculos().stream()
+                .filter(v -> v.getId().equals(idVeiculo))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Veículo com ID " + idVeiculo + " não encontrado para o morador com ID " + idMorador
+                ));
+
+        morador.getVeiculos().remove(veiculoParaExcluir);
+
+        moradorRepository.save(morador);
     }
 }

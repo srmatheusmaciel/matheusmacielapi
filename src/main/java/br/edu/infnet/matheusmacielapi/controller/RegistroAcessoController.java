@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/acessos") // Novo endpoint base
+@RequestMapping("/api/acessos")
 public class RegistroAcessoController {
 
     private final RegistroAcessoService registroAcessoService;

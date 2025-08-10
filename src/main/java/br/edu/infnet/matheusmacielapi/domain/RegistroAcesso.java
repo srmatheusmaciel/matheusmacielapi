@@ -1,9 +1,15 @@
 package br.edu.infnet.matheusmacielapi.domain;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "tb_registro_acesso")
 public class RegistroAcesso {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDateTime dataHoraEntrada;
     private LocalDateTime dataHoraSaida;

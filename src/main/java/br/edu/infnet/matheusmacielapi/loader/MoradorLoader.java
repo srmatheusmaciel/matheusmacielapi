@@ -1,9 +1,7 @@
 package br.edu.infnet.matheusmacielapi.loader;
 
-import br.edu.infnet.matheusmacielapi.domain.Bloco;
-import br.edu.infnet.matheusmacielapi.domain.Morador;
-import br.edu.infnet.matheusmacielapi.domain.Unidade;
-import br.edu.infnet.matheusmacielapi.service.MoradorService;
+import br.edu.infnet.matheusmacielapi.domain.*;
+import br.edu.infnet.matheusmacielapi.repository.*;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
@@ -17,51 +15,53 @@ import java.util.Map;
 @Order(1)
 public class MoradorLoader implements ApplicationRunner {
 
-    private final MoradorService moradorService;
+    private final BlocoRepository blocoRepository;
+    private final UnidadeRepository unidadeRepository;
+    private final MoradorRepository moradorRepository;
 
-    public MoradorLoader(MoradorService moradorService) {
-        this.moradorService = moradorService;
+    public MoradorLoader(BlocoRepository blocoRepository, UnidadeRepository unidadeRepository, MoradorRepository moradorRepository) {
+        this.blocoRepository = blocoRepository;
+        this.unidadeRepository = unidadeRepository;
+        this.moradorRepository = moradorRepository;
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        System.out.println(">>> [MoradorLoader] Iniciando carregamento de Blocos, Unidades e Moradores...");
+        System.out.println(">>> [MoradorLoader] Iniciando carga de Blocos, Unidades e Moradores...");
 
         Map<Long, Bloco> blocosCarregados = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader("dados/blocos.txt"))) {
-            String linha;
-            while ((linha = br.readLine()) != null) {
+            br.lines().forEach(linha -> {
                 String[] campos = linha.split(";");
-                Bloco bloco = new Bloco(Long.parseLong(campos[0]), campos[1]);
-                blocosCarregados.put(bloco.getId(), bloco);
-            }
+                Bloco bloco = new Bloco(null, campos[1]);
+                blocoRepository.save(bloco);
+                blocosCarregados.put(Long.parseLong(campos[0]), bloco);
+            });
         }
 
         Map<Long, Unidade> unidadesCarregadas = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader("dados/unidades.txt"))) {
-            String linha;
-            while ((linha = br.readLine()) != null) {
+            br.lines().forEach(linha -> {
                 String[] campos = linha.split(";");
-                Unidade unidade = new Unidade(
-                        Long.parseLong(campos[0]), campos[1], campos[2],
-                        blocosCarregados.get(Long.parseLong(campos[3]))
-                );
-                unidadesCarregadas.put(unidade.getId(), unidade);
-            }
+                Bloco blocoAssociado = blocosCarregados.get(Long.parseLong(campos[3]));
+                Unidade unidade = new Unidade(null, campos[1], campos[2], blocoAssociado);
+                unidadeRepository.save(unidade);
+                unidadesCarregadas.put(Long.parseLong(campos[0]), unidade);
+            });
         }
 
         try (BufferedReader br = new BufferedReader(new FileReader("dados/moradores.txt"))) {
-            String linha;
-            while ((linha = br.readLine()) != null) {
+            br.lines().forEach(linha -> {
                 String[] campos = linha.split(";");
+                Unidade unidadeAssociada = unidadesCarregadas.get(Long.parseLong(campos[4]));
                 Morador morador = new Morador(
                         campos[0], campos[1], campos[2], campos[3],
-                        unidadesCarregadas.get(Long.parseLong(campos[4])),
+                        unidadeAssociada,
                         Boolean.parseBoolean(campos[5]),
                         Double.parseDouble(campos[6])
                 );
-                moradorService.salvar(morador);
-            }
+                moradorRepository.save(morador);
+            });
         }
         System.out.println(">>> [MoradorLoader] Carga finalizada.");
     }

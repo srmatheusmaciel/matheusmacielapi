@@ -2,36 +2,30 @@ package br.edu.infnet.matheusmacielapi.service;
 
 import br.edu.infnet.matheusmacielapi.domain.Veiculo;
 import br.edu.infnet.matheusmacielapi.infra.exception.ValidacaoNegocioException;
+import br.edu.infnet.matheusmacielapi.repository.VeiculoRepository;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class VeiculoService {
 
-    private final Map<Long, Veiculo> veiculos = new ConcurrentHashMap<>();
-    private final AtomicLong contadorDeIds = new AtomicLong();
+    private final VeiculoRepository veiculoRepository;
 
-    public Collection<Veiculo> listarTodos() {
-        return veiculos.values();
+    public VeiculoService(VeiculoRepository veiculoRepository) {
+        this.veiculoRepository = veiculoRepository;
     }
 
+    @Transactional(readOnly = true)
+    public Collection<Veiculo> listarTodos() {
+        return veiculoRepository.findAll();
+    }
+
+    @Transactional
     public Veiculo salvar(Veiculo veiculo) {
-        if(PlacaJaExiste(veiculo.getPlaca())) {
+        if (veiculoRepository.existsByPlacaIgnoreCase(veiculo.getPlaca())) {
             throw new ValidacaoNegocioException("A placa '" + veiculo.getPlaca() + "' já está cadastrada no sistema.");
         }
-        Long id = contadorDeIds.incrementAndGet();
-        veiculo.setId(id);
-        veiculos.put(id, veiculo);
-        return veiculo;
+        return veiculoRepository.save(veiculo);
     }
-
-    private boolean PlacaJaExiste(String placa) {
-        return veiculos.values().stream()
-                .anyMatch(v -> v.getPlaca().equalsIgnoreCase(placa));
-    }
-
 }

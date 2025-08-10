@@ -1,7 +1,7 @@
 package br.edu.infnet.matheusmacielapi.loader;
 
 import br.edu.infnet.matheusmacielapi.domain.Visitante;
-import br.edu.infnet.matheusmacielapi.service.VisitanteService;
+import br.edu.infnet.matheusmacielapi.repository.VisitanteRepository;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
@@ -13,10 +13,10 @@ import java.io.FileReader;
 @Order(3)
 public class VisitanteLoader implements ApplicationRunner {
 
-    private final VisitanteService visitanteService;
+    private final VisitanteRepository visitanteRepository;
 
-    public VisitanteLoader(VisitanteService visitanteService) {
-        this.visitanteService = visitanteService;
+    public VisitanteLoader(VisitanteRepository visitanteRepository) {
+        this.visitanteRepository = visitanteRepository;
     }
 
     @Override
@@ -24,14 +24,13 @@ public class VisitanteLoader implements ApplicationRunner {
         System.out.println(">>> [VisitanteLoader] Iniciando carregamento de Visitantes...");
 
         try (BufferedReader br = new BufferedReader(new FileReader("dados/visitantes.txt"))) {
-            String linha;
-            while ((linha = br.readLine()) != null) {
+            br.lines().forEach(linha -> {
                 String[] campos = linha.split(";");
                 Visitante visitante = new Visitante(
                         campos[0], campos[1], campos[2], campos[3], campos[4], campos[5]
                 );
-                visitanteService.salvar(visitante);
-            }
+                visitanteRepository.save(visitante);
+            });
         }
         System.out.println(">>> [VisitanteLoader] Carga finalizada.");
     }
