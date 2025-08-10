@@ -42,12 +42,6 @@ public class MoradorController {
         return ResponseEntity.created(uri).body(moradorSalvo);
     }
 
-    @PostMapping("/{moradorId}/veiculos")
-    public ResponseEntity<Veiculo> adicionarVeiculo(@PathVariable Long moradorId, @RequestBody Veiculo veiculo) {
-        Veiculo veiculoSalvo = moradorService.adicionarVeiculo(moradorId, veiculo);
-        return ResponseEntity.status(HttpStatus.CREATED).body(veiculoSalvo);
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<Morador> atualizar(@PathVariable Long id, @RequestBody Morador morador) {
         Morador moradorAtualizado = moradorService.atualizar(id, morador);
@@ -57,6 +51,18 @@ public class MoradorController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         moradorService.excluir(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{moradorId}/veiculos")
+    public ResponseEntity<Veiculo> adicionarVeiculo(@PathVariable Long moradorId, @RequestBody Veiculo veiculo) {
+        Veiculo veiculoSalvo = moradorService.adicionarVeiculo(moradorId, veiculo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(veiculoSalvo);
+    }
+
+    @DeleteMapping("/{idMorador}/veiculos/{idVeiculo}")
+    public ResponseEntity<Void> excluirVeiculo(@PathVariable Long idMorador, @PathVariable Long idVeiculo) {
+        moradorService.excluirVeiculo(idMorador, idVeiculo);
         return ResponseEntity.noContent().build();
     }
 }

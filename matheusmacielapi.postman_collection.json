@@ -256,7 +256,7 @@
 					"response": []
 				},
 				{
-					"name": "http://localhost:8080/api/visitantes/1/registrar-entrada",
+					"name": "Registro de entrada",
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -305,7 +305,7 @@
 					"response": []
 				},
 				{
-					"name": "http://localhost:8080/api/acessos/1/registrar-saida",
+					"name": "Registro de Saida",
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -372,6 +372,29 @@
 								"moradores",
 								"3",
 								"veiculos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "excluir veiculo",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/moradores/1/veiculos/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"moradores",
+								"1",
+								"veiculos",
+								"1"
 							]
 						}
 					},

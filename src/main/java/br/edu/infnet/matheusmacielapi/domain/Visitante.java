@@ -1,14 +1,21 @@
 package br.edu.infnet.matheusmacielapi.domain;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "tb_visitante")
 public class Visitante extends Pessoa{
 
     private String rg;
     private String autorizadoPor;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "visitante_id")
     private List<RegistroAcesso> acessos = new ArrayList<>();
 
     public Visitante(String nome, String documento, String telefone, String email, String rg, String autorizadoPor) {
