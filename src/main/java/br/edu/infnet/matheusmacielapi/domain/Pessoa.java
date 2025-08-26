@@ -1,6 +1,10 @@
 package br.edu.infnet.matheusmacielapi.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @MappedSuperclass
 public abstract class Pessoa {
@@ -10,13 +14,23 @@ public abstract class Pessoa {
     private Long id;
 
     @Column(nullable = false)
+    @NotBlank(message = "O nome não pode ser vazio ou nulo.")
+    @Size(min = 3, max = 100, message = "O nome deve ter entre 3 e 100 caracteres.")
     private String nome;
 
     @Column(nullable = false, unique = true)
+    @NotBlank(message = "O documento não pode ser vazio ou nulo.")
     private String documento;
 
+    @NotBlank(message = "O telefone não pode ser vazio ou nulo.")
+    @Pattern(
+            regexp = "^\\(?\\d{2}\\)?\\s?(?:9\\d{4}|\\d{4})-?\\d{4}$",
+            message = "Telefone inválido. Use o formato (XX)XXXXX-XXXX ou (XX)XXXX-XXXX"
+    )
     private String telefone;
 
+    @Email(message = "O formato do email é inválido.")
+    @NotBlank(message = "O email não pode ser vazio ou nulo.")
     private String email;
 
     public Pessoa(String nome, String documento, String telefone, String email) {

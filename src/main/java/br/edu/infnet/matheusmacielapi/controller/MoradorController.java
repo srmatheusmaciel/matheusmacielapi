@@ -3,6 +3,7 @@ package br.edu.infnet.matheusmacielapi.controller;
 import br.edu.infnet.matheusmacielapi.domain.Morador;
 import br.edu.infnet.matheusmacielapi.domain.Veiculo;
 import br.edu.infnet.matheusmacielapi.service.MoradorService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +33,13 @@ public class MoradorController {
         return ResponseEntity.ok(morador);
     }
 
+    @GetMapping("/buscar")
+    public ResponseEntity<Collection<Morador>> buscarPorNome(@RequestParam String nome) {
+        return ResponseEntity.ok(moradorService.buscarPorNome(nome));
+    }
+
     @PostMapping
-    public ResponseEntity<Morador> salvar(@RequestBody Morador morador) {
+    public ResponseEntity<Morador> salvar(@Valid @RequestBody Morador morador) {
         Morador moradorSalvo = moradorService.salvar(morador);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -43,7 +49,7 @@ public class MoradorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Morador> atualizar(@PathVariable Long id, @RequestBody Morador morador) {
+    public ResponseEntity<Morador> atualizar(@PathVariable Long id, @Valid @RequestBody Morador morador) {
         Morador moradorAtualizado = moradorService.atualizar(id, morador);
         return ResponseEntity.ok(moradorAtualizado);
     }
@@ -55,7 +61,7 @@ public class MoradorController {
     }
 
     @PostMapping("/{moradorId}/veiculos")
-    public ResponseEntity<Veiculo> adicionarVeiculo(@PathVariable Long moradorId, @RequestBody Veiculo veiculo) {
+    public ResponseEntity<Veiculo> adicionarVeiculo(@PathVariable Long moradorId,@Valid @RequestBody Veiculo veiculo) {
         Veiculo veiculoSalvo = moradorService.adicionarVeiculo(moradorId, veiculo);
         return ResponseEntity.status(HttpStatus.CREATED).body(veiculoSalvo);
     }

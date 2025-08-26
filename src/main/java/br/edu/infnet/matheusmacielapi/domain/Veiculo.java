@@ -1,6 +1,8 @@
 package br.edu.infnet.matheusmacielapi.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "tb_veiculo")
@@ -11,9 +13,14 @@ public class Veiculo {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @Pattern(regexp = "[A-Z]{3}[0-9][A-Z][0-9]{2}|[A-Z]{3}[0-9]{4}", message = "O formato da placa é inválido.")
+    @NotBlank(message = "A placa não pode ser vazia ou nula.")
     private String placa;
 
+    @NotBlank(message = "O modelo não pode ser vazio ou nulo.")
     private String modelo;
+
+    @NotBlank(message = "A cor não pode ser vazia ou nula.")
     private String cor;
 
     public Veiculo(Long id, String placa, String modelo, String cor) {
