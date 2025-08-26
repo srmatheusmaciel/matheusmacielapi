@@ -11,11 +11,13 @@ Até o momento, o projeto conta com as seguintes features:
     -   Herança implementada com a classe abstrata `Pessoa` como base para `Morador` e `Visitante`.
     -   Associação (One-to-Many) entre `Morador` e `Veiculo`.
     -   Histórico de acessos com a entidade `RegistroAcesso`, associada a `Visitante`.
--   **API RESTful Completa**: Endpoints para todas as operações CRUD (Criar, Ler, Atualizar, Excluir) para as entidades.
--   **Endpoints de Negócio**: Operações específicas como associar/desassociar veículos e registrar a entrada/saída de visitantes.
+    -   Novo relacionamento One-to-Many entre `Morador` e `Ocorrencia` para registro de eventos.
+-   **Validação de Dados Avançada**: Uso de Bean Validation com `@Valid` e outras anotações (`@NotBlank`, `@Size`, etc.) para garantir a integridade dos dados de entrada.
+-   **API RESTful Completa**: Endpoints para todas as operações CRUD (Criar, Ler, Atualizar, Excluir) para as entidades `Morador`, `Visitante` e `Ocorrencia`.
+-   **Endpoints de Negócio**: Operações específicas como associar/desassociar veículos, registrar a entrada/saída de visitantes e consultas avançadas.
 -   **Persistência de Dados com JPA**: Utilização do Spring Data JPA e um banco de dados em memória (H2) para persistência de dados real.
--   **Carga de Dados Inicial**: Loaders específicos por entidade que populam o banco de dados H2 na inicialização da aplicação.
--   **Tratamento de Exceções**: Manipulador de exceções global (`@RestControllerAdvice`) para retornar respostas de erro padronizadas (404 Not Found, 400 Bad Request).
+-   **Carga de Dados Inicial**: Loaders específicos por entidade que populam o banco de dados H2 na inicialização da aplicação, incluindo dados para a nova entidade `Ocorrencia`.
+-   **Tratamento de Exceções**: Manipulador de exceções global (`@RestControllerAdvice`) para retornar respostas de erro padronizadas (404 Not Found, 400 Bad Request), incluindo erros de validação.
 
 ## Tecnologias Utilizadas
 
@@ -23,6 +25,7 @@ Até o momento, o projeto conta com as seguintes features:
 -   **Spring Boot 3**
 -   **Spring Data JPA**
 -   **H2 Database**
+-   **Bean Validation**
 -   **Maven**
 
 ## Pré-requisitos
@@ -77,6 +80,7 @@ A seguir estão os detalhes dos endpoints disponíveis.
 
 -   `GET /api/moradores`: Lista todos os moradores.
 -   `GET /api/moradores/{id}`: Busca um morador por ID.
+-   `GET /api/moradores/buscar?nome=ana`: **NOVO:** Busca moradores por parte do nome, ignorando o caso.
 -   `POST /api/moradores`: Cria um novo morador.
 -   `PUT /api/moradores/{id}`: Atualiza um morador existente.
 -   `DELETE /api/moradores/{id}`: Exclui um morador.
@@ -92,24 +96,13 @@ A seguir estão os detalhes dos endpoints disponíveis.
             "cor": "Prata"
         }
         ```
--   **NOVO:** `DELETE /api/moradores/{idMorador}/veiculos/{idVeiculo}`: Exclui um veículo específico de um morador.
+-   `DELETE /api/moradores/{idMorador}/veiculos/{idVeiculo}`: Exclui um veículo específico de um morador.
 
 ### Endpoints de Visitantes
 
 -   `GET /api/visitantes`: Lista todos os visitantes.
 -   `GET /api/visitantes/{id}`: Busca um visitante por ID.
 -   `POST /api/visitantes`: Cria um novo visitante.
-    -   **Corpo da Requisição (JSON):**
-        ```json
-        {
-            "nome": "Gavin Belson",
-            "documento": "101.202.303-04",
-            "telefone": "(21)94444-5555",
-            "email": "carla.dias@email.com",
-            "rg": "55.666.777-8",
-            "autorizadoPor": "Ana Souza"
-        }
-        ```
 -   `PUT /api/visitantes/{id}`: Atualiza um visitante existente.
 -   `DELETE /api/visitantes/{id}`: Exclui um visitante.
 
@@ -117,6 +110,21 @@ A seguir estão os detalhes dos endpoints disponíveis.
 
 -   `POST /api/visitantes/{idVisitante}/registrar-entrada`: Registra uma nova entrada para um visitante. Não requer corpo. Retorna o objeto `RegistroAcesso` criado.
 -   `PATCH /api/acessos/{idAcesso}/registrar-saida`: Registra a saída em um registro de acesso existente. Não requer corpo.
+
+### Endpoints de Ocorrências
+
+-   `GET /ocorrencias`: Lista todas as ocorrências.
+-   `POST /ocorrencias/morador/{idMorador}`: **NOVO:** Cria uma nova ocorrência associada a um morador.
+    -   **Corpo da Requisição (JSON):**
+        ```json
+        {
+            "titulo": "Portão da garagem com defeito",
+            "descricao": "O portão da garagem está fazendo um barulho estranho ao fechar.",
+            "data": "2025-08-26",
+            "status": "EM ANDAMENTO"
+        }
+        ```
+-   `GET /api/ocorrencias/buscar?status=RESOLVIDA&dataInicio=2025-08-01&dataFim=2025-08-30`: **NOVO:** Busca ocorrências por status e intervalo de datas.
 
 ## Estrutura de Dados Iniciais
 
@@ -127,3 +135,4 @@ Os dados iniciais são carregados a partir da pasta `/dados`. A estrutura dos ar
 -   **`moradores.txt`**: `nome;documento;telefone;email;id_da_unidade_no_arquivo;proprietario;taxaCondominio`
 -   **`veiculos.txt`**: `id_do_morador_no_banco;placa;modelo;cor`
 -   **`visitantes.txt`**: `nome;documento;telefone;email;rg;autorizadoPor`
+-   **`ocorrencias.txt`**: `id_do_morador_no_banco;titulo;descricao;data(AAAA-MM-DD);status`
