@@ -1,5 +1,6 @@
 package br.edu.infnet.matheusmacielapi.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -21,6 +22,10 @@ public class Morador extends Pessoa{
     @JoinColumn(name = "morador_id")
     private List<Veiculo> veiculos = new ArrayList<>();
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "morador")
+    private List<Ocorrencia> ocorrencias = new ArrayList<>();
+
     public Morador(String nome,
                    String documento,
                    String telefone,
@@ -36,6 +41,14 @@ public class Morador extends Pessoa{
 
     public Morador() {
         super();
+    }
+
+    public List<Ocorrencia> getOcorrencias() {
+        return ocorrencias;
+    }
+
+    public void setOcorrencias(List<Ocorrencia> ocorrencias) {
+        this.ocorrencias = ocorrencias;
     }
 
     public Unidade getUnidade() {

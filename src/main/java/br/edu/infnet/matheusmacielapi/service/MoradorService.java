@@ -30,6 +30,11 @@ public class MoradorService {
                 .orElseThrow(() -> new ResourceNotFoundException("Morador não encontrado para o ID: " + id));
     }
 
+    @Transactional(readOnly = true)
+    public Collection<Morador> buscarPorNome(String nome) {
+        return moradorRepository.findByNomeContainingIgnoreCase(nome);
+    }
+
     @Transactional
     public Morador salvar(Morador morador) {
         return moradorRepository.save(morador);

@@ -1,0 +1,3 @@
+1;Barulho excessivo;O vizinho do apartamento de cima fez barulho após as 22h.;2025-08-25;ABERTA
+2;Lâmpada queimada no corredor;A lâmpada do corredor do 5º andar do Bloco A está queimada.;2025-08-26;ABERTA
+1;Vazamento na garagem;Há uma goteira na vaga de garagem número 15.;2025-08-20;RESOLVIDA

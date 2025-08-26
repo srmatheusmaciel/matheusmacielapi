@@ -86,7 +86,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"nome\": \"Guilherme Freixinho\",\n  \"documento\": \"456.789.123-00\",\n  \"telefone\": \"(21)95555-4444\",\n  \"email\": \"pedro.costa@email.com\",\n  \"unidade\": {\n    \"id\": 101,\n    \"numero\": \"Apto 101\",\n    \"descricao\": \"2 quartos, frente\",\n    \"bloco\": {\n      \"id\": 1,\n      \"nome\": \"Bloco A - Girassol\"\n    }\n  },\n  \"proprietario\": false,\n  \"taxaCondominio\": 620.00\n}",
+							"raw": "{\n  \"nome\": \"Guilherme Freixinho\",\n  \"documento\": \"123.555.222-00\",\n  \"telefone\": \"(21)95555-4444\",\n  \"email\": \"pedro.costa@email.com\",\n  \"unidade\": {\n    \"id\": 2,\n    \"numero\": \"Apto 101\",\n    \"descricao\": \"2 quartos, frente\",\n    \"bloco\": {\n      \"id\": 1,\n      \"nome\": \"Bloco A - Girassol\"\n    }\n  },\n  \"proprietario\": false,\n  \"taxaCondominio\": 620.00\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -395,6 +395,108 @@
 								"1",
 								"veiculos",
 								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ocorrencias",
+			"item": [
+				{
+					"name": "cadastrar ocorrencia",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"titulo\": \"Portão da garagem com defeito\",\n    \"descricao\": \"O portão da garagem está a fazer um barulho estranho ao fechar.\",\n    \"data\": \"2025-08-26\",\n    \"status\": \"EM ANDAMENTO\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/ocorrencias/morador/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"ocorrencias",
+								"morador",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "consultar reclamacao por data",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/ocorrencias/buscar?status=RESOLVIDA&dataInicio=2025-08-01&dataFim=2025-08-22",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"ocorrencias",
+								"buscar"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "RESOLVIDA"
+								},
+								{
+									"key": "dataInicio",
+									"value": "2025-08-01"
+								},
+								{
+									"key": "dataFim",
+									"value": "2025-08-22"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "consultar reclamacao de moradores",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/moradores/buscar?nome=ana",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"moradores",
+								"buscar"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "ana"
+								}
 							]
 						}
 					},
