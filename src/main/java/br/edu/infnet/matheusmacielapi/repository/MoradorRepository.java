@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface MoradorRepository extends JpaRepository<Morador, Long> {
     List<Morador> findByNomeContainingIgnoreCase(String nome);
+    List<Morador> findByNomeContainingIgnoreCaseAndProprietario(String nome, boolean proprietario);
+    List<Morador> findByUnidadeBlocoNomeContainingIgnoreCaseAndVeiculosCorIgnoreCase(String nomeBloco, String corVeiculo);
 }

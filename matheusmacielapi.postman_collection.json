@@ -160,6 +160,73 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "busca por nome e proprietário",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/moradores/buscar/proprietario?nome=carlos&proprietario=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"moradores",
+								"buscar",
+								"proprietario"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "carlos"
+								},
+								{
+									"key": "proprietario",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "busca por bloco e cor do veículo",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/moradores/buscar/localizacao-veiculo?bloco=girassol&cor=preto",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"moradores",
+								"buscar",
+								"localizacao-veiculo"
+							],
+							"query": [
+								{
+									"key": "bloco",
+									"value": "girassol"
+								},
+								{
+									"key": "cor",
+									"value": "preto"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},

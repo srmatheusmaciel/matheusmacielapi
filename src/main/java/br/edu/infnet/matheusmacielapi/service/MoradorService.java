@@ -35,6 +35,17 @@ public class MoradorService {
         return moradorRepository.findByNomeContainingIgnoreCase(nome);
     }
 
+    @Transactional(readOnly = true)
+    public Collection<Morador> buscarPorNomeEStatusProprietario(String nome, boolean ehProprietario) {
+        return moradorRepository.findByNomeContainingIgnoreCaseAndProprietario(nome, ehProprietario);
+    }
+
+    @Transactional(readOnly = true)
+    public Collection<Morador> buscarPorBlocoEVeiculo(String nomeBloco, String corVeiculo) {
+        return moradorRepository.findByUnidadeBlocoNomeContainingIgnoreCaseAndVeiculosCorIgnoreCase(nomeBloco,
+                                                                                                    corVeiculo);
+    }
+
     @Transactional
     public Morador salvar(Morador morador) {
         return moradorRepository.save(morador);
