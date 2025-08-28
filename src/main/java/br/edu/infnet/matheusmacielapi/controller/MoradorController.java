@@ -38,6 +38,22 @@ public class MoradorController {
         return ResponseEntity.ok(moradorService.buscarPorNome(nome));
     }
 
+    @GetMapping("/buscar/proprietario")
+    public ResponseEntity<Collection<Morador>> buscarPorNomeEStatusProprietario(
+            @RequestParam String nome,
+            @RequestParam boolean proprietario
+    ) {
+        return ResponseEntity.ok(moradorService.buscarPorNomeEStatusProprietario(nome, proprietario));
+    }
+
+    @GetMapping("/buscar/localizacao-veiculo")
+    public ResponseEntity<Collection<Morador>> buscarPorBlocoEVeiculo(
+            @RequestParam String bloco,
+            @RequestParam String cor
+    ) {
+        return ResponseEntity.ok(moradorService.buscarPorBlocoEVeiculo(bloco, cor));
+    }
+
     @PostMapping
     public ResponseEntity<Morador> salvar(@Valid @RequestBody Morador morador) {
         Morador moradorSalvo = moradorService.salvar(morador);
