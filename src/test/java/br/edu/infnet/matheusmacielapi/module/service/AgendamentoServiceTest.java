@@ -90,4 +90,20 @@ class AgendamentoServiceTest {
 
         verify(agendamentoRepository, never()).save(any(Agendamento.class));
     }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao tentar agendar para uma data no passado")
+    void deveLancarExcecao_AoAgendarParaDataNoPassado() {
+        Long idMorador = 1L;
+        Long idRecurso = 1L;
+        LocalDate dataNoPassado = LocalDate.now().minusDays(1);
+
+        AgendamentoException exception = assertThrows(
+                AgendamentoException.class,
+                () -> agendamentoService.agendar(idMorador, idRecurso, dataNoPassado)
+        );
+
+        assertEquals("Não é permitido fazer agendamentos para datas passadas.", exception.getMessage());
+        verify(agendamentoRepository, never()).save(any(Agendamento.class));
+    }
 }
