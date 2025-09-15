@@ -5,6 +5,7 @@ import br.edu.infnet.matheusmacielapi.module.agendamento.domain.RecursoComum;
 import br.edu.infnet.matheusmacielapi.module.agendamento.exception.AgendamentoException;
 import br.edu.infnet.matheusmacielapi.module.agendamento.repository.AgendamentoRepository;
 import br.edu.infnet.matheusmacielapi.domain.Morador;
+import br.edu.infnet.matheusmacielapi.module.agendamento.repository.RecursoComumRepository;
 import br.edu.infnet.matheusmacielapi.module.agendamento.service.AgendamentoService;
 import br.edu.infnet.matheusmacielapi.service.MoradorService;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,8 +34,12 @@ class AgendamentoServiceTest {
     @Mock
     private MoradorService moradorService;
 
+    @Mock
+    private RecursoComumRepository recursoComumRepository;
+
     @InjectMocks
     private AgendamentoService agendamentoService;
+
 
     @Test
     @DisplayName("Deve agendar com sucesso quando o recurso está disponível e a data é futura")
@@ -46,6 +52,8 @@ class AgendamentoServiceTest {
         moradorMock.setId(idMorador);
         RecursoComum recursoMock = new RecursoComum(idRecurso, "Churrasqueira", null);
         Agendamento agendamentoSalvoMock = new Agendamento(1L, dataAgendamento, "CONFIRMADO", moradorMock, recursoMock);
+
+        when(recursoComumRepository.findById(idRecurso)).thenReturn(Optional.of(recursoMock));
 
         when(moradorService.buscarPorId(idMorador)).thenReturn(moradorMock);
 
