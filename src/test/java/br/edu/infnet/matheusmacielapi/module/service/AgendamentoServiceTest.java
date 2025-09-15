@@ -17,6 +17,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -135,5 +138,21 @@ class AgendamentoServiceTest {
         );
 
         assertEquals("Agendamento não encontrado para o ID: " + idInexistente, exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve listar todos os agendamentos com sucesso")
+    void deveListarTodosOsAgendamentos_ComSucesso() {
+        Agendamento agendamento1 = new Agendamento(1L, LocalDate.now().plusDays(1), "CONFIRMADO", new Morador(), new RecursoComum());
+        Agendamento agendamento2 = new Agendamento(2L, LocalDate.now().plusDays(2), "CONFIRMADO", new Morador(), new RecursoComum());
+        List<Agendamento> listaMock = Arrays.asList(agendamento1, agendamento2);
+
+        when(agendamentoRepository.findAll()).thenReturn(listaMock);
+
+        Collection<Agendamento> resultado = agendamentoService.listarTodos();
+
+        assertNotNull(resultado);
+        assertEquals(2, resultado.size());
+        verify(agendamentoRepository, times(1)).findAll();
     }
 }

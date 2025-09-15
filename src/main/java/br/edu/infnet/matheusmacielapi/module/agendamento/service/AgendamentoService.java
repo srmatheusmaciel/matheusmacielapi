@@ -10,6 +10,7 @@ import br.edu.infnet.matheusmacielapi.service.MoradorService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collection;
 
 import br.edu.infnet.matheusmacielapi.module.agendamento.repository.RecursoComumRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +52,11 @@ public class AgendamentoService {
     public Agendamento buscarPorId(Long id) {
         return agendamentoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado para o ID: " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public Collection<Agendamento> listarTodos() {
+        return agendamentoRepository.findAll();
     }
 
     private void validarDisponibilidade(Long idRecurso, LocalDate dataAgendamento) {
