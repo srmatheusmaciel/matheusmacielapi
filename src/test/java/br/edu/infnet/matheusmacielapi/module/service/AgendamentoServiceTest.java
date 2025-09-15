@@ -1,5 +1,6 @@
 package br.edu.infnet.matheusmacielapi.module.service;
 
+import br.edu.infnet.matheusmacielapi.infra.exception.ResourceNotFoundException;
 import br.edu.infnet.matheusmacielapi.module.agendamento.domain.Agendamento;
 import br.edu.infnet.matheusmacielapi.module.agendamento.domain.RecursoComum;
 import br.edu.infnet.matheusmacielapi.module.agendamento.exception.AgendamentoException;
@@ -105,5 +106,34 @@ class AgendamentoServiceTest {
 
         assertEquals("Não é permitido fazer agendamentos para datas passadas.", exception.getMessage());
         verify(agendamentoRepository, never()).save(any(Agendamento.class));
+    }
+
+    @Test
+    @DisplayName("Deve buscar um agendamento por ID com sucesso")
+    void deveBuscarAgendamentoPorId_ComSucesso() {
+        Long idAgendamento = 1L;
+        Agendamento agendamentoMock = new Agendamento(idAgendamento, LocalDate.now(), "CONFIRMADO", new Morador(), new RecursoComum());
+
+        when(agendamentoRepository.findById(idAgendamento)).thenReturn(Optional.of(agendamentoMock));
+
+        Agendamento agendamentoEncontrado = agendamentoService.buscarPorId(idAgendamento);
+
+        assertNotNull(agendamentoEncontrado);
+        assertEquals(idAgendamento, agendamentoEncontrado.getId());
+        verify(agendamentoRepository, times(1)).findById(idAgendamento);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao buscar agendamento com ID inexistente")
+    void deveLancarExcecao_AoBuscarAgendamentoComIdInexistente() {
+        Long idInexistente = 99L;
+        when(agendamentoRepository.findById(idInexistente)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> agendamentoService.buscarPorId(idInexistente)
+        );
+
+        assertEquals("Agendamento não encontrado para o ID: " + idInexistente, exception.getMessage());
     }
 }

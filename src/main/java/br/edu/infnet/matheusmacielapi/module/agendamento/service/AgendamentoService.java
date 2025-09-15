@@ -30,15 +30,7 @@ public class AgendamentoService {
     }
 
     public Agendamento agendar(Long idMorador, Long idRecurso, LocalDate dataAgendamento) {
-
-        if (dataAgendamento.isBefore(LocalDate.now())) {
-            throw new AgendamentoException("Não é permitido fazer agendamentos para datas passadas.");
-        }
-
-        boolean jaAgendado = agendamentoRepository.existsByRecursoIdAndDataAgendamento(idRecurso, dataAgendamento);
-        if (jaAgendado) {
-            throw new AgendamentoException("Este recurso já está agendado para a data selecionada.");
-        }
+        validarDisponibilidade(idRecurso, dataAgendamento);
 
         Morador morador = moradorService.buscarPorId(idMorador);
 
@@ -52,5 +44,16 @@ public class AgendamentoService {
         novoAgendamento.setStatus("CONFIRMADO");
 
         return agendamentoRepository.save(novoAgendamento);
+    }
+
+    private void validarDisponibilidade(Long idRecurso, LocalDate dataAgendamento) {
+        if (dataAgendamento.isBefore(LocalDate.now())) {
+            throw new AgendamentoException("Não é permitido fazer agendamentos para datas passadas.");
+        }
+
+        boolean jaAgendado = agendamentoRepository.existsByRecursoIdAndDataAgendamento(idRecurso, dataAgendamento);
+        if (jaAgendado) {
+            throw new AgendamentoException("Este recurso já está agendado para a data selecionada.");
+        }
     }
 }
