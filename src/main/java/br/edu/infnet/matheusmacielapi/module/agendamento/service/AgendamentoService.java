@@ -60,6 +60,20 @@ public class AgendamentoService {
     }
 
     @Transactional
+    public Agendamento atualizar(Long id, LocalDate novaData) {
+        Agendamento agendamento = buscarPorId(id);
+
+        if (novaData.equals(agendamento.getDataAgendamento())) {
+            return agendamento;
+        }
+
+        validarDisponibilidade(agendamento.getRecurso().getId(), novaData);
+
+        agendamento.setDataAgendamento(novaData);
+        return agendamentoRepository.save(agendamento);
+    }
+
+    @Transactional
     public void cancelar(Long id) {
         Agendamento agendamento = buscarPorId(id);
         agendamentoRepository.delete(agendamento);
