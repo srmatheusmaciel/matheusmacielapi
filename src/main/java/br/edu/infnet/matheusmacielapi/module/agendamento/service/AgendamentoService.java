@@ -1,8 +1,7 @@
 package br.edu.infnet.matheusmacielapi.module.agendamento.service;
 
-
-
 import br.edu.infnet.matheusmacielapi.domain.Morador;
+import br.edu.infnet.matheusmacielapi.infra.exception.ResourceNotFoundException;
 import br.edu.infnet.matheusmacielapi.module.agendamento.domain.Agendamento;
 import br.edu.infnet.matheusmacielapi.module.agendamento.domain.RecursoComum;
 import br.edu.infnet.matheusmacielapi.module.agendamento.exception.AgendamentoException;
@@ -11,8 +10,10 @@ import br.edu.infnet.matheusmacielapi.service.MoradorService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collection;
 
 import br.edu.infnet.matheusmacielapi.module.agendamento.repository.RecursoComumRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AgendamentoService {
@@ -31,15 +32,12 @@ public class AgendamentoService {
     }
 
     public Agendamento agendar(Long idMorador, Long idRecurso, LocalDate dataAgendamento) {
-        boolean jaAgendado = agendamentoRepository.existsByRecursoIdAndDataAgendamento(idRecurso, dataAgendamento);
-        if (jaAgendado) {
-            throw new AgendamentoException("Este recurso já está agendado para a data selecionada.");
-        }
+        validarDisponibilidade(idRecurso, dataAgendamento);
 
         Morador morador = moradorService.buscarPorId(idMorador);
 
         RecursoComum recurso = recursoComumRepository.findById(idRecurso)
-                .orElseThrow(() -> new RuntimeException("Recurso não encontrado!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Recurso comum não encontrado para o ID: " + idRecurso));
 
         Agendamento novoAgendamento = new Agendamento();
         novoAgendamento.setMorador(morador);
@@ -48,5 +46,47 @@ public class AgendamentoService {
         novoAgendamento.setStatus("CONFIRMADO");
 
         return agendamentoRepository.save(novoAgendamento);
+    }
+
+    @Transactional(readOnly = true)
+    public Agendamento buscarPorId(Long id) {
+        return agendamentoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado para o ID: " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public Collection<Agendamento> listarTodos() {
+        return agendamentoRepository.findAll();
+    }
+
+    @Transactional
+    public Agendamento atualizar(Long id, LocalDate novaData) {
+        Agendamento agendamento = buscarPorId(id);
+
+        if (novaData.equals(agendamento.getDataAgendamento())) {
+            return agendamento;
+        }
+
+        validarDisponibilidade(agendamento.getRecurso().getId(), novaData);
+
+        agendamento.setDataAgendamento(novaData);
+        return agendamentoRepository.save(agendamento);
+    }
+
+    @Transactional
+    public void cancelar(Long id) {
+        Agendamento agendamento = buscarPorId(id);
+        agendamentoRepository.delete(agendamento);
+    }
+
+    private void validarDisponibilidade(Long idRecurso, LocalDate dataAgendamento) {
+        if (dataAgendamento.isBefore(LocalDate.now())) {
+            throw new AgendamentoException("Não é permitido fazer agendamentos para datas passadas.");
+        }
+
+        boolean jaAgendado = agendamentoRepository.existsByRecursoIdAndDataAgendamento(idRecurso, dataAgendamento);
+        if (jaAgendado) {
+            throw new AgendamentoException("Este recurso já está agendado para a data selecionada.");
+        }
     }
 }

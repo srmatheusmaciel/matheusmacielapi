@@ -1,5 +1,6 @@
 package br.edu.infnet.matheusmacielapi.module.service;
 
+import br.edu.infnet.matheusmacielapi.infra.exception.ResourceNotFoundException;
 import br.edu.infnet.matheusmacielapi.module.agendamento.domain.Agendamento;
 import br.edu.infnet.matheusmacielapi.module.agendamento.domain.RecursoComum;
 import br.edu.infnet.matheusmacielapi.module.agendamento.exception.AgendamentoException;
@@ -16,6 +17,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,6 +91,134 @@ class AgendamentoServiceTest {
         );
 
         assertEquals("Este recurso já está agendado para a data selecionada.", exception.getMessage());
+
+        verify(agendamentoRepository, never()).save(any(Agendamento.class));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao tentar agendar para uma data no passado")
+    void deveLancarExcecao_AoAgendarParaDataNoPassado() {
+        Long idMorador = 1L;
+        Long idRecurso = 1L;
+        LocalDate dataNoPassado = LocalDate.now().minusDays(1);
+
+        AgendamentoException exception = assertThrows(
+                AgendamentoException.class,
+                () -> agendamentoService.agendar(idMorador, idRecurso, dataNoPassado)
+        );
+
+        assertEquals("Não é permitido fazer agendamentos para datas passadas.", exception.getMessage());
+        verify(agendamentoRepository, never()).save(any(Agendamento.class));
+    }
+
+    @Test
+    @DisplayName("Deve buscar um agendamento por ID com sucesso")
+    void deveBuscarAgendamentoPorId_ComSucesso() {
+        Long idAgendamento = 1L;
+        Agendamento agendamentoMock = new Agendamento(idAgendamento, LocalDate.now(), "CONFIRMADO", new Morador(), new RecursoComum());
+
+        when(agendamentoRepository.findById(idAgendamento)).thenReturn(Optional.of(agendamentoMock));
+
+        Agendamento agendamentoEncontrado = agendamentoService.buscarPorId(idAgendamento);
+
+        assertNotNull(agendamentoEncontrado);
+        assertEquals(idAgendamento, agendamentoEncontrado.getId());
+        verify(agendamentoRepository, times(1)).findById(idAgendamento);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao buscar agendamento com ID inexistente")
+    void deveLancarExcecao_AoBuscarAgendamentoComIdInexistente() {
+        Long idInexistente = 99L;
+        when(agendamentoRepository.findById(idInexistente)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> agendamentoService.buscarPorId(idInexistente)
+        );
+
+        assertEquals("Agendamento não encontrado para o ID: " + idInexistente, exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve listar todos os agendamentos com sucesso")
+    void deveListarTodosOsAgendamentos_ComSucesso() {
+        Agendamento agendamento1 = new Agendamento(1L, LocalDate.now().plusDays(1), "CONFIRMADO", new Morador(), new RecursoComum());
+        Agendamento agendamento2 = new Agendamento(2L, LocalDate.now().plusDays(2), "CONFIRMADO", new Morador(), new RecursoComum());
+        List<Agendamento> listaMock = Arrays.asList(agendamento1, agendamento2);
+
+        when(agendamentoRepository.findAll()).thenReturn(listaMock);
+
+        Collection<Agendamento> resultado = agendamentoService.listarTodos();
+
+        assertNotNull(resultado);
+        assertEquals(2, resultado.size());
+        verify(agendamentoRepository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("Deve cancelar um agendamento com sucesso")
+    void deveCancelarAgendamento_ComSucesso() {
+        Long idAgendamentoExistente = 1L;
+        Agendamento agendamentoMock = new Agendamento();
+
+        when(agendamentoRepository.findById(idAgendamentoExistente)).thenReturn(Optional.of(agendamentoMock));
+        doNothing().when(agendamentoRepository).delete(agendamentoMock);
+
+        agendamentoService.cancelar(idAgendamentoExistente);
+
+        verify(agendamentoRepository, times(1)).delete(agendamentoMock);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao tentar cancelar agendamento inexistente")
+    void deveLancarExcecao_AoTentarCancelarAgendamentoInexistente() {
+        Long idInexistente = 99L;
+        when(agendamentoRepository.findById(idInexistente)).thenReturn(Optional.empty());
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> agendamentoService.cancelar(idInexistente)
+        );
+
+        verify(agendamentoRepository, never()).delete(any(Agendamento.class));
+    }
+
+
+    @Test
+    @DisplayName("Deve atualizar a data de um agendamento com sucesso")
+    void deveAtualizarAgendamento_ComSucesso() {
+        Long idExistente = 1L;
+        LocalDate dataAntiga = LocalDate.now().plusDays(10);
+        LocalDate novaData = LocalDate.now().plusDays(15);
+
+        Agendamento agendamentoOriginal = new Agendamento(idExistente, dataAntiga, "CONFIRMADO", new Morador(), new RecursoComum());
+        agendamentoOriginal.getRecurso().setId(1L);
+
+        Agendamento agendamentoAtualizado = new Agendamento(idExistente, novaData, "CONFIRMADO", new Morador(), new RecursoComum());
+
+        when(agendamentoRepository.findById(idExistente)).thenReturn(Optional.of(agendamentoOriginal));
+        when(agendamentoRepository.existsByRecursoIdAndDataAgendamento(anyLong(), eq(novaData))).thenReturn(false);
+        when(agendamentoRepository.save(any(Agendamento.class))).thenReturn(agendamentoAtualizado);
+
+        Agendamento resultado = agendamentoService.atualizar(idExistente, novaData);
+
+        assertNotNull(resultado);
+        assertEquals(novaData, resultado.getDataAgendamento());
+        verify(agendamentoRepository, times(1)).save(any(Agendamento.class));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao tentar atualizar agendamento inexistente")
+    void deveLancarExcecao_AoTentarAtualizarAgendamentoInexistente() {
+        Long idInexistente = 99L;
+        LocalDate novaData = LocalDate.now().plusDays(5);
+        when(agendamentoRepository.findById(idInexistente)).thenReturn(Optional.empty());
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> agendamentoService.atualizar(idInexistente, novaData)
+        );
 
         verify(agendamentoRepository, never()).save(any(Agendamento.class));
     }
