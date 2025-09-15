@@ -183,4 +183,43 @@ class AgendamentoServiceTest {
 
         verify(agendamentoRepository, never()).delete(any(Agendamento.class));
     }
+
+
+    @Test
+    @DisplayName("Deve atualizar a data de um agendamento com sucesso")
+    void deveAtualizarAgendamento_ComSucesso() {
+        Long idExistente = 1L;
+        LocalDate dataAntiga = LocalDate.now().plusDays(10);
+        LocalDate novaData = LocalDate.now().plusDays(15);
+
+        Agendamento agendamentoOriginal = new Agendamento(idExistente, dataAntiga, "CONFIRMADO", new Morador(), new RecursoComum());
+        agendamentoOriginal.getRecurso().setId(1L);
+
+        Agendamento agendamentoAtualizado = new Agendamento(idExistente, novaData, "CONFIRMADO", new Morador(), new RecursoComum());
+
+        when(agendamentoRepository.findById(idExistente)).thenReturn(Optional.of(agendamentoOriginal));
+        when(agendamentoRepository.existsByRecursoIdAndDataAgendamento(anyLong(), eq(novaData))).thenReturn(false);
+        when(agendamentoRepository.save(any(Agendamento.class))).thenReturn(agendamentoAtualizado);
+
+        Agendamento resultado = agendamentoService.atualizar(idExistente, novaData);
+
+        assertNotNull(resultado);
+        assertEquals(novaData, resultado.getDataAgendamento());
+        verify(agendamentoRepository, times(1)).save(any(Agendamento.class));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao tentar atualizar agendamento inexistente")
+    void deveLancarExcecao_AoTentarAtualizarAgendamentoInexistente() {
+        Long idInexistente = 99L;
+        LocalDate novaData = LocalDate.now().plusDays(5);
+        when(agendamentoRepository.findById(idInexistente)).thenReturn(Optional.empty());
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> agendamentoService.atualizar(idInexistente, novaData)
+        );
+
+        verify(agendamentoRepository, never()).save(any(Agendamento.class));
+    }
 }
