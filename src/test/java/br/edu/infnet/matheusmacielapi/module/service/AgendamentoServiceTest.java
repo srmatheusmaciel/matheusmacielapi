@@ -2,8 +2,10 @@ package br.edu.infnet.matheusmacielapi.module.service;
 
 import br.edu.infnet.matheusmacielapi.module.agendamento.domain.Agendamento;
 import br.edu.infnet.matheusmacielapi.module.agendamento.domain.RecursoComum;
+import br.edu.infnet.matheusmacielapi.module.agendamento.exception.AgendamentoException;
 import br.edu.infnet.matheusmacielapi.module.agendamento.repository.AgendamentoRepository;
 import br.edu.infnet.matheusmacielapi.domain.Morador;
+import br.edu.infnet.matheusmacielapi.module.agendamento.repository.RecursoComumRepository;
 import br.edu.infnet.matheusmacielapi.module.agendamento.service.AgendamentoService;
 import br.edu.infnet.matheusmacielapi.service.MoradorService;
 import org.junit.jupiter.api.DisplayName;
@@ -14,10 +16,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class AgendamentoServiceTest {
@@ -28,8 +34,12 @@ class AgendamentoServiceTest {
     @Mock
     private MoradorService moradorService;
 
+    @Mock
+    private RecursoComumRepository recursoComumRepository;
+
     @InjectMocks
     private AgendamentoService agendamentoService;
+
 
     @Test
     @DisplayName("Deve agendar com sucesso quando o recurso está disponível e a data é futura")
@@ -43,6 +53,8 @@ class AgendamentoServiceTest {
         RecursoComum recursoMock = new RecursoComum(idRecurso, "Churrasqueira", null);
         Agendamento agendamentoSalvoMock = new Agendamento(1L, dataAgendamento, "CONFIRMADO", moradorMock, recursoMock);
 
+        when(recursoComumRepository.findById(idRecurso)).thenReturn(Optional.of(recursoMock));
+
         when(moradorService.buscarPorId(idMorador)).thenReturn(moradorMock);
 
         when(agendamentoRepository.save(any(Agendamento.class))).thenReturn(agendamentoSalvoMock);
@@ -53,5 +65,29 @@ class AgendamentoServiceTest {
         assertEquals("CONFIRMADO", agendamentoRealizado.getStatus());
         assertEquals(idMorador, agendamentoRealizado.getMorador().getId());
         assertEquals(idRecurso, agendamentoRealizado.getRecurso().getId());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao agendar recurso em data já reservada")
+    void deveLancarExcecao_AoAgendarRecursoEmDataJaReservada() {
+        Long idMorador = 1L;
+        Long idRecurso = 1L;
+        LocalDate dataAgendamento = LocalDate.of(2025, 10, 20);
+
+        RecursoComum recursoExistente = new RecursoComum(idRecurso, "Churrasqueira", null);
+        Agendamento agendamentoExistente = new Agendamento(1L, dataAgendamento, "CONFIRMADO", new Morador(), recursoExistente);
+
+        when(agendamentoRepository.existsByRecursoIdAndDataAgendamento(idRecurso, dataAgendamento))
+                .thenReturn(true);
+
+
+        AgendamentoException exception = assertThrows(
+                AgendamentoException.class,
+                () -> agendamentoService.agendar(idMorador, idRecurso, dataAgendamento)
+        );
+
+        assertEquals("Este recurso já está agendado para a data selecionada.", exception.getMessage());
+
+        verify(agendamentoRepository, never()).save(any(Agendamento.class));
     }
 }
