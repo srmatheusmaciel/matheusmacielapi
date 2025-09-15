@@ -155,4 +155,32 @@ class AgendamentoServiceTest {
         assertEquals(2, resultado.size());
         verify(agendamentoRepository, times(1)).findAll();
     }
+
+    @Test
+    @DisplayName("Deve cancelar um agendamento com sucesso")
+    void deveCancelarAgendamento_ComSucesso() {
+        Long idAgendamentoExistente = 1L;
+        Agendamento agendamentoMock = new Agendamento();
+
+        when(agendamentoRepository.findById(idAgendamentoExistente)).thenReturn(Optional.of(agendamentoMock));
+        doNothing().when(agendamentoRepository).delete(agendamentoMock);
+
+        agendamentoService.cancelar(idAgendamentoExistente);
+
+        verify(agendamentoRepository, times(1)).delete(agendamentoMock);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao tentar cancelar agendamento inexistente")
+    void deveLancarExcecao_AoTentarCancelarAgendamentoInexistente() {
+        Long idInexistente = 99L;
+        when(agendamentoRepository.findById(idInexistente)).thenReturn(Optional.empty());
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> agendamentoService.cancelar(idInexistente)
+        );
+
+        verify(agendamentoRepository, never()).delete(any(Agendamento.class));
+    }
 }
