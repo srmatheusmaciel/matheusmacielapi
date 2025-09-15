@@ -1,11 +1,12 @@
 package br.edu.infnet.matheusmacielapi.module.agendamento.service;
 
 
+
 import br.edu.infnet.matheusmacielapi.domain.Morador;
 import br.edu.infnet.matheusmacielapi.module.agendamento.domain.Agendamento;
 import br.edu.infnet.matheusmacielapi.module.agendamento.domain.RecursoComum;
 import br.edu.infnet.matheusmacielapi.module.agendamento.repository.AgendamentoRepository;
-import br.edu.infnet.matheusmacielapi.repository.MoradorRepository;
+import br.edu.infnet.matheusmacielapi.service.MoradorService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -14,16 +15,15 @@ import java.time.LocalDate;
 public class AgendamentoService {
 
     private final AgendamentoRepository agendamentoRepository;
-    private final MoradorRepository moradorRepository;
+    private final MoradorService moradorService;
 
-    public AgendamentoService(AgendamentoRepository agendamentoRepository, MoradorRepository moradorRepository) {
+    public AgendamentoService(AgendamentoRepository agendamentoRepository, MoradorService moradorService) {
         this.agendamentoRepository = agendamentoRepository;
-        this.moradorRepository = moradorRepository;
+        this.moradorService = moradorService;
     }
 
     public Agendamento agendar(Long idMorador, Long idRecurso, LocalDate dataAgendamento) {
-        Morador morador = moradorRepository.findById(idMorador)
-                .orElseThrow(() -> new RuntimeException("Morador não encontrado!"));
+        Morador morador = moradorService.buscarPorId(idMorador);
 
         RecursoComum recurso = new RecursoComum();
         recurso.setId(idRecurso);
