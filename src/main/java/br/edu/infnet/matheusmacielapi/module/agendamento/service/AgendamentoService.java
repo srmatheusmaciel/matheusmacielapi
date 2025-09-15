@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 
 import br.edu.infnet.matheusmacielapi.module.agendamento.repository.RecursoComumRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AgendamentoService {
@@ -44,6 +45,12 @@ public class AgendamentoService {
         novoAgendamento.setStatus("CONFIRMADO");
 
         return agendamentoRepository.save(novoAgendamento);
+    }
+
+    @Transactional(readOnly = true)
+    public Agendamento buscarPorId(Long id) {
+        return agendamentoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado para o ID: " + id));
     }
 
     private void validarDisponibilidade(Long idRecurso, LocalDate dataAgendamento) {
