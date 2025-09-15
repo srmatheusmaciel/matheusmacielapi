@@ -4,6 +4,7 @@ import br.edu.infnet.matheusmacielapi.module.agendamento.domain.Agendamento;
 import br.edu.infnet.matheusmacielapi.module.agendamento.domain.RecursoComum;
 import br.edu.infnet.matheusmacielapi.module.agendamento.repository.AgendamentoRepository;
 import br.edu.infnet.matheusmacielapi.domain.Morador;
+import br.edu.infnet.matheusmacielapi.module.agendamento.service.AgendamentoService;
 import br.edu.infnet.matheusmacielapi.repository.MoradorRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
