@@ -1,8 +1,7 @@
 package br.edu.infnet.matheusmacielapi.module.agendamento.service;
 
-
-
 import br.edu.infnet.matheusmacielapi.domain.Morador;
+import br.edu.infnet.matheusmacielapi.infra.exception.ResourceNotFoundException;
 import br.edu.infnet.matheusmacielapi.module.agendamento.domain.Agendamento;
 import br.edu.infnet.matheusmacielapi.module.agendamento.domain.RecursoComum;
 import br.edu.infnet.matheusmacielapi.module.agendamento.exception.AgendamentoException;
@@ -39,7 +38,7 @@ public class AgendamentoService {
         Morador morador = moradorService.buscarPorId(idMorador);
 
         RecursoComum recurso = recursoComumRepository.findById(idRecurso)
-                .orElseThrow(() -> new RuntimeException("Recurso não encontrado!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Recurso comum não encontrado para o ID: " + idRecurso));
 
         Agendamento novoAgendamento = new Agendamento();
         novoAgendamento.setMorador(morador);
