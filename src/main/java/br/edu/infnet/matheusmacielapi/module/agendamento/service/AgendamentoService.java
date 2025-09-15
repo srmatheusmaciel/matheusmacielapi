@@ -59,6 +59,12 @@ public class AgendamentoService {
         return agendamentoRepository.findAll();
     }
 
+    @Transactional
+    public void cancelar(Long id) {
+        Agendamento agendamento = buscarPorId(id);
+        agendamentoRepository.delete(agendamento);
+    }
+
     private void validarDisponibilidade(Long idRecurso, LocalDate dataAgendamento) {
         if (dataAgendamento.isBefore(LocalDate.now())) {
             throw new AgendamentoException("Não é permitido fazer agendamentos para datas passadas.");
