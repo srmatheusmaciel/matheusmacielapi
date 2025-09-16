@@ -95,7 +95,7 @@ A seguir estão os detalhes dos endpoints disponíveis.
 
 * `GET /api/moradores`: Lista todos os moradores.
 * `GET /api/moradores/{id}`: Busca um morador por ID.
-* `GET /api/moradores/buscar?nome=ana`: **NOVO:** Busca moradores por parte do nome, ignorando o caso.
+* `GET /api/moradores/buscar?nome=ana`: Busca moradores por parte do nome, ignorando o caso.
 * `POST /api/moradores`: Cria um novo morador.
 * `PUT /api/moradores/{id}`: Atualiza um morador existente.
 * `DELETE /api/moradores/{id}`: Exclui um morador.
@@ -137,7 +137,7 @@ A seguir estão os detalhes dos endpoints disponíveis.
 ### Endpoints de Ocorrências
 
 * `GET /api/ocorrencias`: Lista todas as ocorrências.
-* `POST /api/ocorrencias/morador/{idMorador}`: **NOVO:** Cria uma nova ocorrência associada a um morador.
+* `POST /api/ocorrencias/morador/{idMorador}`: Cria uma nova ocorrência associada a um morador.
 
   * **Corpo da Requisição (JSON):**
 
@@ -149,7 +149,7 @@ A seguir estão os detalhes dos endpoints disponíveis.
         "status": "EM ANDAMENTO"
     }
     ```
-* `GET /api/ocorrencias/buscar?status=RESOLVIDA&dataInicio=2025-08-01&dataFim=2025-08-30`: **NOVO:** Busca ocorrências por status e intervalo de datas.
+* `GET /api/ocorrencias/buscar?status=RESOLVIDA&dataInicio=2025-08-01&dataFim=2025-08-30`: Busca ocorrências por status e intervalo de datas.
 
 ---
 
