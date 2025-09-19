@@ -1,5 +1,7 @@
 package br.edu.infnet.matheusmacielapi.module.agendamento.service;
 
+import br.edu.infnet.matheusmacielapi.client.FeriadoApiClient;
+import br.edu.infnet.matheusmacielapi.client.dto.VerificacaoFeriadoDTO;
 import br.edu.infnet.matheusmacielapi.domain.Morador;
 import br.edu.infnet.matheusmacielapi.infra.exception.ResourceNotFoundException;
 import br.edu.infnet.matheusmacielapi.module.agendamento.domain.Agendamento;
@@ -7,6 +9,8 @@ import br.edu.infnet.matheusmacielapi.module.agendamento.domain.RecursoComum;
 import br.edu.infnet.matheusmacielapi.module.agendamento.exception.AgendamentoException;
 import br.edu.infnet.matheusmacielapi.module.agendamento.repository.AgendamentoRepository;
 import br.edu.infnet.matheusmacielapi.service.MoradorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,21 +22,28 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AgendamentoService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AgendamentoService.class);
+
     private final AgendamentoRepository agendamentoRepository;
     private final MoradorService moradorService;
     private final RecursoComumRepository recursoComumRepository;
+    private final FeriadoApiClient feriadoApiClient;
 
     public AgendamentoService(
             AgendamentoRepository agendamentoRepository,
             MoradorService moradorService,
-            RecursoComumRepository recursoComumRepository) {
+            RecursoComumRepository recursoComumRepository,
+            FeriadoApiClient feriadoApiClient) {
         this.agendamentoRepository = agendamentoRepository;
         this.moradorService = moradorService;
         this.recursoComumRepository = recursoComumRepository;
+        this.feriadoApiClient = feriadoApiClient;
     }
 
     public Agendamento agendar(Long idMorador, Long idRecurso, LocalDate dataAgendamento) {
         validarDisponibilidade(idRecurso, dataAgendamento);
+
+        verificarSeEhFeriado(dataAgendamento);
 
         Morador morador = moradorService.buscarPorId(idMorador);
 
@@ -69,6 +80,8 @@ public class AgendamentoService {
 
         validarDisponibilidade(agendamento.getRecurso().getId(), novaData);
 
+        verificarSeEhFeriado(novaData);
+
         agendamento.setDataAgendamento(novaData);
         return agendamentoRepository.save(agendamento);
     }
@@ -77,6 +90,20 @@ public class AgendamentoService {
     public void cancelar(Long id) {
         Agendamento agendamento = buscarPorId(id);
         agendamentoRepository.delete(agendamento);
+    }
+
+    private void verificarSeEhFeriado(LocalDate data) {
+        try {
+            logger.info("Verificando se a data {} é um feriado...", data);
+            VerificacaoFeriadoDTO verificacao = feriadoApiClient.verificarFeriado(data);
+            if (verificacao.isHoliday()) {
+                logger.warn("ATENÇÃO: O agendamento está a ser feito num feriado: {}", verificacao.getHolidayName());
+            } else {
+                logger.info("A data {} não é um feriado.", data);
+            }
+        } catch (Exception e) {
+            logger.error("Não foi possível verificar a data do feriado. O serviço pode estar offline.", e);
+        }
     }
 
     private void validarDisponibilidade(Long idRecurso, LocalDate dataAgendamento) {
