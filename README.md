@@ -61,6 +61,32 @@ A camada de Serviço (`@Service`) é a responsável por orquestrar a conversão 
 
 O `AgendamentoResponseDTO` é um exemplo claro de **orquestração de dados**: ele contém não só os detalhes do agendamento (dados do `common-domain`), mas também a informação se a data é um feriado e o nome desse feriado (dados do `external-api-client`), fornecendo uma resposta completa e enriquecida para o cliente final.
 
+
+## Segurança com Spring Security (Feature 4)
+
+A API foi protegida utilizando o framework Spring Security para garantir que apenas utilizadores autorizados possam aceder aos recursos. A implementação focou-se nos pilares de autenticação e autorização.
+
+### Autenticação
+
+* **Mecanismo**: A autenticação é realizada via **HTTP Basic Auth**. Todas as requisições à API devem incluir um cabeçalho `Authorization` com as credenciais do utilizador.
+* **Gestão de Utilizadores**: Para esta implementação, foram configurados dois utilizadores em memória com senhas codificadas utilizando BCrypt:
+    * `username`: **admin** | `password`: admin123 | `role`: ADMIN, USER
+    * `username`: **user** | `password`: password123 | `role`: USER
+
+### Autorização Baseada em Roles
+
+Foram definidas regras de acesso granulares para diferentes contextos da API, aplicando o **Princípio do Menor Privilégio**:
+
+* **Contexto de Moradores (`/api/moradores/**`)**:
+    * `GET` (Leitura): Acessível por `ADMIN` e `USER`.
+    * `POST`, `PUT`, `DELETE` (Escrita e Modificação): Acessível **apenas** por `ADMIN`.
+
+* **Contexto de Agendamentos (`/api/agendamentos/**`)**:
+    * `GET`, `POST`, `PUT` (Leitura e Gestão): Acessível por `ADMIN` e `USER`.
+    * `DELETE` (Cancelamento): Acessível **apenas** por `ADMIN`.
+
+* **Segurança por Padrão**: Qualquer outro endpoint que não corresponda às regras acima (ex: `/api/visitantes/**`) exige que o utilizador esteja, no mínimo, autenticado, garantindo que nenhum recurso fique exposto acidentalmente.
+
 ## Tecnologias Utilizadas
 
 * **Java 21** (ou superior)
