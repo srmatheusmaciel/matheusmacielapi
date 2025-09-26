@@ -25,6 +25,42 @@ Até o momento, o projeto conta com as seguintes features:
 * **Desenvolvimento Guiado por Testes (TDD) (NOVO)**:
   O módulo de agendamentos foi implementado integralmente seguindo o ciclo **Red-Green-Refactor**, garantindo robustez e qualidade do código.
 
+## Arquitetura Avançada (Feature 3)
+
+O projeto foi refatorado para uma arquitetura multi-módulos, seguindo as melhores práticas de design de software para garantir a separação de responsabilidades, escalabilidade e manutenção. Além disso, o padrão Data Transfer Object (DTO) foi aplicado de forma estratégica.
+
+### Estrutura Multi-Módulos
+
+A aplicação agora está organizada em três módulos Maven distintos, cada um com uma responsabilidade clara:
+
+* **`common-domain`**: Este módulo é a base do nosso negócio. Ele contém as entidades de domínio (classes JPA como `Morador`, `Agendamento`, etc.) que são partilhadas por toda a aplicação. As entidades aqui são "limpas", focadas apenas na representação dos dados e nos relacionamentos, sem anotações de validação de API ou de serialização JSON.
+
+* **`external-api-client`**: Responsável por isolar toda a comunicação com APIs externas. Atualmente, ele contém o Feign Client (`FeriadoApiClient`) e os DTOs necessários para consumir o nosso microsserviço `feriado-api`. Esta separação protege o resto da aplicação de mudanças em serviços de terceiros.
+
+* **`main-application`**: O coração da aplicação. Este módulo contém a lógica de negócio (`Services`), os endpoints REST (`Controllers`), os `Repositories` para acesso a dados e a classe principal que inicia a aplicação Spring Boot. É aqui que os DTOs da nossa própria API são definidos e utilizados.
+
+### Aplicação do Padrão DTO
+
+O padrão DTO foi implementado para criar um "contrato" de API robusto e seguro, desacoplando a representação interna dos dados (entidades) da representação externa (JSON).
+
+* **Request DTOs (Dados de Entrada)**: Para todas as operações de `POST` e `PUT` (ex: `MoradorRequestDTO`, `AgendamentoRequestDTO`), foram criados DTOs específicos para receber os dados. Todas as anotações de validação (`@NotBlank`, `@Email`, `@Size`, etc.) foram movidas das entidades para estes DTOs. Isso protege o nosso domínio de dados inválidos e centraliza as regras de validação da API num único local.
+
+* **Response DTOs (Dados de Saída)**: Para as respostas da API (`GET`, `POST`, `PUT`), foram criados DTOs que modelam a informação a ser enviada ao cliente (ex: `MoradorResponseDTO`, `AgendamentoResponseDTO`). Esta abordagem permite-nos:
+    * **Ocultar dados internos**: Campos como `taxaCondominio` ou `documento` podem ser omitidos.
+    * **Formatar os dados**: Um campo booleano `proprietario` foi transformado numa String "Sim" ou "Não" no `MoradorResponseDTO` para uma melhor experiência do cliente.
+    * **Orientação ao cliente**: A resposta é desenhada para ser exatamente o que o consumidor da API precisa, nada mais, nada menos.
+
+### Relação entre Entidades, DTOs e Orquestração de Dados
+
+A camada de Serviço (`@Service`) é a responsável por orquestrar a conversão entre as entidades e os DTOs. O fluxo é o seguinte:
+
+1.  Um `Controller` recebe um `RequestDTO` validado.
+2.  O `Service` recebe o `RequestDTO`, mapeia os seus dados para uma entidade de domínio (`Morador`, `Agendamento`, etc.) e executa a lógica de negócio (ex: salvar no banco de dados).
+3.  Para devolver uma resposta, o `Service` pega a entidade resultante do passo anterior e, se necessário, chama outros serviços (como o `FeriadoApiClient` no `external-api-client`).
+4.  Finalmente, o `Service` combina os dados da entidade interna com os dados externos (se houver) e mapeia tudo para um `ResponseDTO`.
+
+O `AgendamentoResponseDTO` é um exemplo claro de **orquestração de dados**: ele contém não só os detalhes do agendamento (dados do `common-domain`), mas também a informação se a data é um feriado e o nome desse feriado (dados do `external-api-client`), fornecendo uma resposta completa e enriquecida para o cliente final.
+
 ## Tecnologias Utilizadas
 
 * **Java 21** (ou superior)
